@@ -1,90 +1,115 @@
+// driver.cpp
 #include <iostream>
-#include <string>
-#include "Student.hpp"
-#include "Course.hpp"
+#include <limits>
 #include "LinkedList.hpp"
+#include "LinkedList.cpp"
+#include "Student.hpp"
+#include "Student.cpp"
 
-using namespace std;
 
-int main()
-{
-  // Create a linked list to store Student objects
-    LinkedList<Student> studentList;
+// Function to clear input buffer
+void clearInputBuffer() {
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
+int main() {
+    LinkedList studentList;
     int choice;
-    float gpa;
-    int id;
-    string name;
-    string courseName, courseLocation;
+
     do {
-        cout << "Menu:\n";
-        cout << "1. Add Student\n";
-        cout << "2. Delete Student\n";
-        cout << "3. Search Student\n";
-        cout << "4. Display All Students\n";
-        cout << "5. Add Course to Student\n";
-        cout << "6. Exit\n";
-        cout << "Enter your choice: ";
-        cin >> choice;
+        std::cout << "\n--- Student Management System Menu ---" << std::endl;
+        std::cout << "1. Insert a student" << std::endl;
+        std::cout << "2. Delete a student by ID" << std::endl;
+        std::cout << "3. Search for a student by ID" << std::endl;
+        std::cout << "4. Display all students" << std::endl;
+        std::cout << "5. Count the number of students" << std::endl;
+        std::cout << "6. Add a course to a student" << std::endl;
+        std::cout << "7. Exit" << std::endl;
+        std::cout << "Enter your choice: ";
+        std::cin >> choice;
+
+        if (std::cin.fail()) {
+            std::cout << "Invalid input. Please enter a number." << std::endl;
+            std::cin.clear();
+            clearInputBuffer();
+            continue;
+        }
+        clearInputBuffer();
 
         switch (choice) {
-            case 1:
-                cout << "Enter Student ID: ";
-                cin >> id;
-                cout << "Enter Student Name: ";
-                cin.ignore(); // To ignore the newline character left in the buffer
-                getline(cin, name);
-                cout << "Enter Student GPA: ";
-                cin >> gpa;
-                studentList.append(Student(id, name, gpa));
-                cout << "Student added successfully.\n";
+            case 1: {
+                int id;
+                std::string name;
+                float gpa;
+                std::cout << "Enter student ID: ";
+                std::cin >> id;
+                std::cout << "Enter student name: ";
+                std::cin.ignore();
+                std::getline(std::cin, name);
+                std::cout << "Enter student GPA: ";
+                std::cin >> gpa;
+                studentList.insert(Student(id, name, gpa));
+                std::cout << "Student added successfully." << std::endl;
                 break;
-            case 2:
-                // Implement delete functionality
-                cout << "Delete functionality not implemented yet.\n";
-                break;
-            case 3:
-                // Implement search functionality
-                cout << "Search functionality not implemented yet.\n";
-                break;
-            case 4:
-                if (studentList.isEmpty()) {
-                    cout << "No students in the list.\n";
+            }
+            case 2: {
+                int id;
+                std::cout << "Enter ID of student to delete: ";
+                std::cin >> id;
+                if (studentList.deleteById(id)) {
+                    std::cout << "Student with ID " << id << " deleted successfully." << std::endl;
                 } else {
-                    for (int i = 0; i < studentList.getLength(); ++i) {
-                        Student s = studentList.getElement(i);
-                        s.displayDetails();
-                    }
+                    std::cout << "Student with ID " << id << " not found." << std::endl;
                 }
+                break;
+            }
+            case 3: {
+                int id;
+                std::cout << "Enter ID of student to search: ";
+                std::cin >> id;
+                Student* student = studentList.searchById(id);
+                if (student != nullptr) {
+                    student->displayDetails();
+                } else {
+                    std::cout << "Student with ID " << id << " not found." << std::endl;
+                }
+                break;
+            }
+            case 4:
+                std::cout << "--- All Students ---" << std::endl;
+                studentList.displayAll();
                 break;
             case 5:
-                cout << "Enter Student ID to add course: ";
-                cin >> id;
-                {
-                    bool found = false;
-                    for (int i = 0; i < studentList.getLength(); ++i) {
-                        Student& s = studentList.getElement(i);
-                        if (s.id == id) {
-                            found = true;
-                            cout << "Enter Course Name: ";
-                            cin.ignore(); // To ignore the newline character left in the buffer
-                            getline(cin, courseName);
-                            cout << "Enter Course Location: ";
-                            getline(cin, courseLocation);
-                            s.addCourse(Course(courseName, courseLocation));
-                            cout << "Course added successfully to student ID " << id << ".\n";
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        cout << "Student with ID " << id << " not found.\n";
-                    }
+                std::cout << "Total number of students: " << studentList.countStudents() << std::endl;
+                break;
+            case 6: {
+                int studentId;
+                std::string courseName, courseLocation;
+                std::cout << "Enter ID of student to add a course to: ";
+                std::cin >> studentId;
+                Student* student = studentList.searchById(studentId);
+                if (student != nullptr) {
+                    std::cout << "Enter course name: ";
+                    std::cin.ignore();
+                    std::getline(std::cin, courseName);
+                    std::cout << "Enter course location: ";
+                    std::getline(std::cin, courseLocation);
+                    student->addCourse(Course(courseName, courseLocation));
+                    std::cout << "Course added successfully to student " << studentId << "." << std::endl;
+                } else {
+                    std::cout << "Student with ID " << studentId << " not found." << std::endl;
                 }
                 break;
-            case 6:
-                cout << "Exiting program.\n";
+            }
+            case 7:
+                std::cout << "Exiting program. Goodbye!" << std::endl;
+                break;
+            default:
+                std::cout << "Invalid choice. Please try again." << std::endl;
                 break;
         }
-    } while (choice != 6);
+
+    } while (choice != 7);
 
     return 0;
 }
