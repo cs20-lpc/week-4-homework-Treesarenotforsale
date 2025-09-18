@@ -1,4 +1,3 @@
-// TO DO:  Student class definition  here.
 // Student.hpp
 #ifndef STUDENT_HPP
 #define STUDENT_HPP
